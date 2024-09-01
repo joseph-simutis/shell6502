@@ -6,7 +6,13 @@ value class RawShort(val data: UShort) : Comparable<RawShort> {
     constructor(uByte: UByte) : this(uByte.toUShort())
     constructor(low: RawByte, high: RawByte) : this((low + high * RawByte.MAX).data)
 
-    fun split() = Pair(RawByte((data and 0x00FFu).toUByte()), RawByte(((data and 0xFF00u).toInt() ushr 8).toUByte()))
+    val low: RawByte
+        get() = RawByte((data and 0x00FFu).toUByte())
+
+    val high: RawByte
+        get() = RawByte(((data and 0xFF00u).toInt() ushr 8).toUByte())
+
+    fun split() = Pair(low, high)
 
     fun toInt() = data.toInt()
 

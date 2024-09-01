@@ -29,7 +29,7 @@ class Virtual6502() {
         A = readMemory(RawShort.ZERO)
         P = RawByte.ZERO
         PC = readMemory(RawShort.RESET.first, RawShort.RESET.second)
-        S = RawByte.MAX
+        S = RawByte(0xFDu)
         X = readMemory(RawShort.ZERO)
         Y = readMemory(RawShort.ZERO)
         isInitialized = true
