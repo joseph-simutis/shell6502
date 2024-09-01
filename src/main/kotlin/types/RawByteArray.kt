@@ -9,8 +9,13 @@ value class RawByteArray(val data: UByteArray) : Collection<RawByte> {
     operator fun get(index: Int) = RawByte(data[index])
     operator fun get(index: RawShort) = this[index.toInt()]
 
-    operator fun set(index: Int, value: RawByte) { data[index] = value.data }
-    operator fun set(index: RawShort, value: RawByte) { this[index.toInt()] = value }
+    operator fun set(index: Int, value: RawByte) {
+        data[index] = value.data
+    }
+
+    operator fun set(index: RawShort, value: RawByte) {
+        this[index.toInt()] = value
+    }
 
     override val size: Int
         get() = data.size

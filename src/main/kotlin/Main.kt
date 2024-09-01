@@ -16,6 +16,8 @@ class Shell6502() : CliktCommand() {
     val v6502 = Virtual6502()
 
     override fun run() {
+        v6502.initialize()
+        v6502.clockCycle()
     }
 }
 
