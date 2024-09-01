@@ -7,9 +7,17 @@ value class RawByte(val data: UByte) : Comparable<RawByte> {
     fun toRawShort() = RawShort(toUShort())
     fun toUShort() = data.toUShort()
 
-    operator fun plus(other: RawByte) = RawByte((data + other.data).toUByte())
-    operator fun plus(other: RawShort) = other + this
-    operator fun plus(other: Int) = this + RawByte(other.toUByte())
+    operator fun plus(other: RawByte) = RawShort(data + other.data)
+    operator fun plus(other: RawShort) = this.toRawShort() + other
+    operator fun plus(other: UInt) = this + RawByte(other.toUByte())
+
+    operator fun minus(other: RawByte) = RawShort(data - other.data)
+    operator fun minus(other: RawShort) = this.toRawShort() - other
+    operator fun minus(other: UInt) = this - RawByte(other.toUByte())
+
+    operator fun times(other: RawByte) = RawShort(data * other.data)
+    operator fun times(other: RawShort) = this.toRawShort() * other
+    operator fun times(other: UInt) = this * RawByte(other.toUByte())
 
     companion object {
         val ZERO = RawByte(0x00u)

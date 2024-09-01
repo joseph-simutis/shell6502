@@ -52,9 +52,11 @@ class Virtual6502() {
         return true
     }
 
-    private fun decodeInstruction(): Pair<Operation, AddressMode> {}
+    private fun decodeInstruction(): Pair<Operation, AddressMode> {
+        TODO()
+    }
 
     private fun runInstruction(operation: Operation, addressMode: AddressMode) {
-        operation.run(this, addressMode.getAddress(this, readMemory(PC+1, PC+2)))
+        operation.run(this, addressMode.getAddress(this, readMemory(PC + 1u, PC + 2u)))
     }
 }
