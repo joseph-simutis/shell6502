@@ -26,18 +26,19 @@ class Virtual6502() {
 
     //Make sure to run this before anything else.
     fun initialize() {
-        A = readMemory(RawShort(0x0000u))
+        A = readMemory(RawShort.ZERO)
         P = RawByte.ZERO
-        PC = readMemory(RawShort(0xFFFCu)) combine readMemory(RawShort(0xFFFDu))
+        PC = readMemory(RawShort.RESET.first, RawShort.RESET.second)
         S = RawByte.MAX
-        X = readMemory(RawShort(0x0000u))
-        Y = readMemory(RawShort(0x0000u))
+        X = readMemory(RawShort.ZERO)
+        Y = readMemory(RawShort.ZERO)
         isInitialized = true
     }
 
     fun readMemory(address: RawShort): RawByte {
         return memory[address]
     }
+    fun readMemory(addressLow: RawShort, addressHigh: RawShort) = RawShort(readMemory(addressLow), readMemory(addressHigh))
 
     fun writeMemory(address: RawShort, value: RawByte) {
         memory[address] = value
@@ -54,6 +55,6 @@ class Virtual6502() {
     private fun decodeInstruction(): Pair<Operation, AddressMode> {}
 
     private fun runInstruction(operation: Operation, addressMode: AddressMode) {
-        operation.run(this, addressMode.getAddress(this, readMemory(PC+1) combine readMemory(PC+2)))
+        operation.run(this, addressMode.getAddress(this, readMemory(PC+1, PC+2)))
     }
 }

@@ -2,12 +2,14 @@ package io.github.josephsimutis.types
 
 @JvmInline
 value class RawByte(val data: UByte) : Comparable<RawByte> {
-    infix fun combine(other: RawByte) =
-        RawShort((data.toUShort() + other.data.toUShort() * 0x00FFu.toUShort()).toUShort())
-
     override fun compareTo(other: RawByte): Int = data.compareTo(other.data)
 
-    fun toRawShort() = this combine RawByte(0x00u)
+    fun toRawShort() = RawShort(toUShort())
+    fun toUShort() = data.toUShort()
+
+    operator fun plus(other: RawByte) = RawByte((data + other.data).toUByte())
+    operator fun plus(other: RawShort) = other + this
+    operator fun plus(other: Int) = this + RawByte(other.toUByte())
 
     companion object {
         val ZERO = RawByte(0x00u)
