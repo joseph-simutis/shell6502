@@ -22,17 +22,26 @@ class Virtual6502() {
     // Do not read or write to this directly, instead use the readMemory and writeMemory methods instead, as those respect memory mapping.
     private val memory = RawByteArray(0xFFFF)
 
-    private var isInitialized = false
+    private var isOn = false
 
     //Make sure to run this before anything else.
-    fun initialize() {
+    fun on() {
         A = readMemory(RawShort.ZERO)
         P = RawByte.ZERO
         PC = readMemory(RawShort.RESET.first, RawShort.RESET.second)
         S = RawByte(0xFDu)
         X = readMemory(RawShort.ZERO)
         Y = readMemory(RawShort.ZERO)
-        isInitialized = true
+        isOn = true
+    }
+
+    fun off() {
+        isOn = false
+    }
+
+    fun hardReset() {
+        off()
+        on()
     }
 
     fun readMemory(address: RawShort): RawByte {
@@ -45,7 +54,7 @@ class Virtual6502() {
     }
 
     fun clockCycle(): Boolean {
-        if (!isInitialized) return false
+        if (!isOn) return false
         val instruction = decodeInstruction()
         runInstruction(instruction.first, instruction.second)
         PC += instruction.second.instructionLength
