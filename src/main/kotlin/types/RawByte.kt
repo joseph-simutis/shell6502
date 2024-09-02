@@ -1,6 +1,7 @@
 package io.github.josephsimutis.types
 
 @JvmInline
+@OptIn(ExperimentalStdlibApi::class)
 value class RawByte(val data: UByte) : Comparable<RawByte> {
     override fun compareTo(other: RawByte): Int = data.compareTo(other.data)
 
@@ -18,6 +19,8 @@ value class RawByte(val data: UByte) : Comparable<RawByte> {
     operator fun times(other: RawByte) = RawShort(data * other.data)
     operator fun times(other: RawShort) = this.toRawShort() * other
     operator fun times(other: UInt) = this * RawByte(other.toUByte())
+
+    override fun toString() = data.toHexString(HexFormat.UpperCase)
 
     companion object {
         val ZERO = RawByte(0x00u)

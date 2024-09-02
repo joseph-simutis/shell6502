@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.josephsimutis"
-version = "1.0.0-alpha.1"
+version = "1.0.0-pre.1"
 
 repositories {
     mavenCentral()

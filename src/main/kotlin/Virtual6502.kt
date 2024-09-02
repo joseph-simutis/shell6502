@@ -4,7 +4,7 @@ import io.github.josephsimutis.types.RawByte
 import io.github.josephsimutis.types.RawByteArray
 import io.github.josephsimutis.types.RawShort
 import io.github.josephsimutis.types.instruction.AddressMode
-import io.github.josephsimutis.types.instruction.Operation
+import io.github.josephsimutis.types.instruction.Instruction
 
 class Virtual6502() {
     // Accumulator
@@ -26,13 +26,13 @@ class Virtual6502() {
 
     //Make sure to run this before anything else.
     fun on() {
+        isOn = true
         A = readMemory(RawShort.ZERO)
         P = RawByte.ZERO
         PC = readMemory(RawShort.RESET.first, RawShort.RESET.second)
         S = RawByte(0xFDu)
         X = readMemory(RawShort.ZERO)
         Y = readMemory(RawShort.ZERO)
-        isOn = true
     }
 
     fun off() {
@@ -61,11 +61,11 @@ class Virtual6502() {
         return true
     }
 
-    private fun decodeInstruction(): Pair<Operation, AddressMode> {
+    private fun decodeInstruction(): Pair<Instruction, AddressMode> {
         TODO()
     }
 
-    private fun runInstruction(operation: Operation, addressMode: AddressMode) {
-        operation.run(this, addressMode.getAddress(this, readMemory(PC + 1u, PC + 2u)))
+    private fun runInstruction(instruction: Instruction, addressMode: AddressMode) {
+        instruction.run(this, addressMode.getAddress(this, readMemory(PC + 1u, PC + 2u)))
     }
 }

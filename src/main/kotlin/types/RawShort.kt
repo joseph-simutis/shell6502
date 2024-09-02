@@ -1,6 +1,7 @@
 package io.github.josephsimutis.types
 
 @JvmInline
+@OptIn(ExperimentalStdlibApi::class)
 value class RawShort(val data: UShort) : Comparable<RawShort> {
     constructor(uInt: UInt) : this(uInt.toUShort())
     constructor(uByte: UByte) : this(uByte.toUShort())
@@ -29,6 +30,8 @@ value class RawShort(val data: UShort) : Comparable<RawShort> {
     operator fun times(other: RawShort) = RawShort(data * other.data)
     operator fun times(other: RawByte) = this * other.toRawShort()
     operator fun times(other: UInt) = this * RawShort(other)
+
+    override fun toString() = "[L:$low,H:$high]"
 
     companion object {
         val ZERO = RawShort(0x0000u)
