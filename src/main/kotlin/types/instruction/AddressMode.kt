@@ -12,7 +12,7 @@ enum class AddressMode(val instructionLength: UInt, val getAddress: (Virtual6502
     ABSOLUTE_Y(3u, { v6502, nextWord -> nextWord + v6502.Y }),
     ZERO_PAGE(2u, { _, nextWord -> nextWord.low.toRawShort() }),
 
-    // Note: ZERO_PAGE_X and ZERO_PAGE_Y are programmed in a bit of a weird way in order to insure that the address always remains in the zero page.
+    // Note: ZERO_PAGE_X and ZERO_PAGE_Y are programmed in a bit of a weird way in order to ensure that the address always remains in the zero page.
     ZERO_PAGE_X(2u, { v6502, nextWord -> (nextWord.low + v6502.X).low.toRawShort() }),
     ZERO_PAGE_Y(2u, { v6502, nextWord -> (nextWord.low + v6502.Y).low.toRawShort() }),
     INDIRECT(3u, { v6502, nextWord -> v6502.readMemory(nextWord, nextWord + 1u) }),

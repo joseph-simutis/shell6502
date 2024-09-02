@@ -35,15 +35,24 @@ class Shell6502() : CliktCommand() {
                         if (command.startsWith('@')) {
                             when (command) {
                                 "@print" -> {
-                                    terminal.prompt("Enter the address in the form \"LLHH\"") {
+                                    terminal.prompt("Enter the low byte") { lowInput ->
                                         try {
-                                            if (it.length != 4) throw IllegalArgumentException()
-                                            val bytes = it.chunked(2)
-                                            val address = RawShort(RawByte(bytes[0].hexToUByte()), RawByte(bytes[1].hexToUByte()))
-                                            echo("The value at address $address is ${v6502.readMemory(address)}")
-                                            ConversionResult.Valid(it)
+                                            if (lowInput.length != 2) throw IllegalArgumentException()
+                                            val low = RawByte(lowInput.hexToUByte())
+                                            terminal.prompt("Enter the high byte") { highInput ->
+                                                try {
+                                                    if (highInput.length != 2) throw IllegalArgumentException()
+                                                    val high = RawByte(highInput.toInt(16).toUByte())
+                                                    val address = RawShort(low, high)
+                                                    echo("The value stored at address $address is ${v6502.readMemory(address)}")
+                                                    ConversionResult.Valid(highInput)
+                                                } catch (_: IllegalArgumentException) {
+                                                    ConversionResult.Invalid("$highInput is not a valid byte!")
+                                                }
+                                            }
+                                            ConversionResult.Valid(lowInput)
                                         } catch (_: IllegalArgumentException) {
-                                            ConversionResult.Invalid("$it is not a valid address!")
+                                            ConversionResult.Invalid("$lowInput is not a valid byte!")
                                         }
                                     }
                                 }
@@ -55,13 +64,15 @@ class Shell6502() : CliktCommand() {
                                     @help: Shows this message.
                                     @exit: Exits the program.
                                     
-                                    To run an instruction on the V6502, simply type the assembly for it in without starting with a @.
+                                    To run an instruction on the V6502, simply type the assembly for it in.
                                 """.trimIndent()
                                 )
 
                                 "@exit" -> exiting = true
                                 else -> echo("Invalid command! Type @help for help.")
                             }
+                        } else {
+                            echo("Invalid command! Type @help for help.")
                         }
                         ConversionResult.Valid(command)
                     }

@@ -5,7 +5,7 @@ package io.github.josephsimutis.types
 value class RawShort(val data: UShort) : Comparable<RawShort> {
     constructor(uInt: UInt) : this(uInt.toUShort())
     constructor(uByte: UByte) : this(uByte.toUShort())
-    constructor(low: RawByte, high: RawByte) : this((low + high * RawByte.MAX).data)
+    constructor(low: RawByte, high: RawByte) : this((low.toUInt() + (high.toUInt() shl 8)))
 
     val low: RawByte
         get() = RawByte((data and 0x00FFu).toUByte())
@@ -31,7 +31,7 @@ value class RawShort(val data: UShort) : Comparable<RawShort> {
     operator fun times(other: RawByte) = this * other.toRawShort()
     operator fun times(other: UInt) = this * RawShort(other)
 
-    override fun toString() = "[L:$low,H:$high]"
+    override fun toString() = data.toHexString(HexFormat.UpperCase)
 
     companion object {
         val ZERO = RawShort(0x0000u)
