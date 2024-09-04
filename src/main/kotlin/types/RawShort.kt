@@ -31,7 +31,12 @@ value class RawShort(val data: UShort) : Comparable<RawShort> {
     operator fun times(other: RawByte) = this * other.toRawShort()
     operator fun times(other: UInt) = this * RawShort(other)
 
+    operator fun inc() = this + 1u
+    operator fun dec() = this - 1u
+
     override fun toString() = data.toHexString(HexFormat.UpperCase)
+
+    infix fun signedPlus(other: Byte) = RawShort((data.toShort() + other).toUShort())
 
     companion object {
         val ZERO = RawShort(0x0000u)

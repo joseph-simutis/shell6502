@@ -30,25 +30,25 @@ class Virtual6502() {
 
     var negativeFlag: Boolean
         get() = P[7]
-        set(value) { P[7] = value }
+        set(value) { P = P.withFlag(7, value) }
     var overflowFlag: Boolean
         get() = P[6]
-        set(value) { P[6] = value }
+        set(value) { P = P.withFlag(6, value) }
     var breakFlag: Boolean
         get() = P[4]
-        set(value) { P[4] = value }
+        set(value) { P = P.withFlag(4, value) }
     var decimalFlag: Boolean
         get() = P[3]
-        set(value) { P[3] = value }
+        set(value) { P = P.withFlag(3, value) }
     var interruptDisableFlag: Boolean
         get() = P[2]
-        set(value) { P[2] = value }
+        set(value) { P = P.withFlag(2, value) }
     var zeroFlag: Boolean
         get() = P[1]
-        set(value) { P[1] = value }
+        set(value) { P = P.withFlag(1, value) }
     var carryFlag: Boolean
         get() = P[0]
-        set(value) { P[0] = value }
+        set(value) { P = P.withFlag(0, value) }
 
     private var isOn = false
 
@@ -57,7 +57,7 @@ class Virtual6502() {
         isOn = true
         A = readMemory(RawShort.ZERO)
         P = RawByte.ZERO
-        PC = readMemory(RawShort.RESET.first, RawShort.RESET.second)
+        PC = readMemory(RawShort.RESET)
         S = RawByte(0xFDu)
         X = readMemory(RawShort.ZERO)
         Y = readMemory(RawShort.ZERO)
@@ -79,6 +79,8 @@ class Virtual6502() {
     fun readMemory(addressLow: RawShort, addressHigh: RawShort) =
         RawShort(readMemory(addressLow), readMemory(addressHigh))
 
+    fun readMemory(address: Pair<RawShort, RawShort>) = readMemory(address.first, address.second)
+
     fun writeMemory(address: RawShort, value: RawByte) {
         memory[address] = value
     }
@@ -96,6 +98,41 @@ class Virtual6502() {
     }
 
     private fun runInstruction(instruction: Instruction, addressMode: AddressMode) {
-        instruction.run(this, addressMode.getAddress(this, readMemory(PC + 1u, PC + 2u)))
+        instruction.run(this, addressMode, addressMode.getAddress(this, readMemory(PC + 1u, PC + 2u)))
+    }
+
+    fun pushStack(byte: RawByte) {
+        writeMemory(RawShort(S, RawByte.ONE), byte)
+        S--
+    }
+
+    fun pushStack(short: RawShort) {
+        pushStack(short.low)
+        pushStack(short.high)
+    }
+
+    fun pullByteFromStack(): RawByte {
+        S++
+        return readMemory(RawShort(S, RawByte.ONE))
+    }
+
+    fun pullShortFromStack(): RawShort {
+        val low = pullByteFromStack()
+        val high = pullByteFromStack()
+        return RawShort(low, high)
+    }
+
+    fun calculateNegative(value: RawByte) {
+        if (!isOn) return
+        negativeFlag = value.data.toByte() < 0
+    }
+
+    fun calculateOverflow() {
+        if (!isOn) return
+    }
+
+    fun calculateZero(value: RawByte) {
+        if (!isOn) return
+        zeroFlag = value == RawByte.ZERO
     }
 }
