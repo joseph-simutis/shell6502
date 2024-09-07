@@ -131,6 +131,7 @@ class Virtual6502() {
             val cc = byte and RawByte(0x3u)
 
             return when(cc) {
+                RawByte.ZERO -> Pair()
                 RawByte.ONE -> Pair(when(aaa) {
                     RawByte.ZERO -> Instruction.ORA
                     RawByte.ONE -> Instruction.AND
@@ -152,8 +153,26 @@ class Virtual6502() {
                     RawByte(0x7u) -> AddressMode.ABSOLUTE_X
                     else -> AddressMode.ERROR
                 })
-                RawByte(0x2u) -> Pair(when(aaa) {}, when(bbb) {})
-                RawByte(0x3u) -> {}
+                RawByte(0x2u) -> Pair(when(aaa) {
+                    RawByte.ZERO -> Instruction.ASL
+                    RawByte.ONE -> Instruction.ROL
+                    RawByte(0x2u) -> Instruction.LSR
+                    RawByte(0x3u) -> Instruction.ROR
+                    RawByte(0x4u) -> Instruction.STX
+                    RawByte(0x5u) -> Instruction.LDX
+                    RawByte(0x6u) -> Instruction.DEC
+                    RawByte(0x7u) -> Instruction.INC
+                    else -> Instruction.ERROR
+                }, when(bbb) {
+                    RawByte.ZERO -> AddressMode.IMMEDIATE
+                    RawByte.ONE -> AddressMode.ZERO_PAGE
+                    RawByte(0x2u) -> AddressMode.ACCUMULATOR
+                    RawByte(0x3u) -> AddressMode.ABSOLUTE
+                    RawByte(0x4u) -> AddressMode.INDIRECT
+                    RawByte(0x5u) -> AddressMode.ZERO_PAGE_X
+                    RawByte(0x7u) -> AddressMode.ABSOLUTE_X
+                    else -> AddressMode.ERROR
+                })
                 else -> Pair(Instruction.ERROR, AddressMode.ERROR)
             }
         }
