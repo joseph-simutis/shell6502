@@ -47,7 +47,12 @@ enum class Instruction (val run: (Virtual6502, AddressMode, RawShort) -> Unit) {
             v6502.PC = v6502.PC signedPlus address.low.toByte()
         }
     }),
-    BIT({ v6502, addressMode, address -> }),
+    BIT({ v6502, _, address ->
+        val memory = v6502.readMemory(address)
+        v6502.calculateZero(v6502.A and memory)
+        v6502.calculateNegative(memory)
+        v6502.overflowFlag = memory[6]
+    }),
     BMI({ v6502, _, address ->
         if (v6502.negativeFlag) {
             v6502.PC = v6502.PC signedPlus address.low.toByte()
@@ -92,9 +97,24 @@ enum class Instruction (val run: (Virtual6502, AddressMode, RawShort) -> Unit) {
     CLV({ v6502, _, _ ->
         v6502.overflowFlag = false
     }),
-    CMP({ v6502, addressMode, address -> }),
-    CPX({ v6502, addressMode, address -> }),
-    CPY({ v6502, addressMode, address -> }),
+    CMP({ v6502, _, address ->
+        val output = v6502.A.subtractWithBorrow(v6502.readMemory(address), true)
+        v6502.calculateNegative(output.first)
+        v6502.calculateZero(output.first)
+        v6502.carryFlag = output.second
+    }),
+    CPX({ v6502, _, address ->
+        val output = v6502.X.subtractWithBorrow(v6502.readMemory(address), true)
+        v6502.calculateNegative(output.first)
+        v6502.calculateZero(output.first)
+        v6502.carryFlag = output.second
+    }),
+    CPY({ v6502, _, address ->
+        val output = v6502.Y.subtractWithBorrow(v6502.readMemory(address), true)
+        v6502.calculateNegative(output.first)
+        v6502.calculateZero(output.first)
+        v6502.carryFlag = output.second
+    }),
     DEC({ v6502, _, address ->
         val output = (v6502.readMemory(address) - 1u).low
         v6502.writeMemory(address, output)

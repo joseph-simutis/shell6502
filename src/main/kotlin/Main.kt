@@ -69,10 +69,19 @@ class Shell6502() : CliktCommand() {
                                 )
 
                                 "@exit" -> exiting = true
-                                else -> echo("Invalid command! Type @help for help.")
+                                else -> echo("Invalid command! Type @help for help.", err=true)
                             }
                         } else {
-                            echo("Invalid command! Type @help for help.")
+                            if (Assembler.isAssembly(command)) {
+                                var index = v6502.PC
+                                Assembler.assemble(command)!!.forEach { byte ->
+                                    v6502.writeMemory(index, byte)
+                                    index++
+                                }
+                                v6502.clockCycle()
+                            } else {
+                                echo("Not assembly! Type @help for help.", err=true)
+                            }
                         }
                         ConversionResult.Valid(command)
                     }

@@ -87,19 +87,21 @@ class Virtual6502() {
 
     fun clockCycle(): Boolean {
         if (!isOn) return false
-        val instruction = decodeInstruction(readMemory(PC))
-        runInstruction(instruction.first, instruction.second)
+        val instruction = decodeInstruction(readMemory(PC)) ?: return false
+        runInstruction(instruction)
         PC += instruction.second.instructionLength
         return true
     }
 
-    private fun decodeInstruction(byte: RawByte): Pair<Instruction, AddressMode> {
+    private fun decodeInstruction(byte: RawByte): Pair<Instruction, AddressMode>? {
         TODO()
     }
 
     private fun runInstruction(instruction: Instruction, addressMode: AddressMode) {
         instruction.run(this, addressMode, addressMode.getAddress(this, readMemory(PC + 1u, PC + 2u)))
     }
+
+    private fun runInstruction(instruction: Pair<Instruction, AddressMode>) = runInstruction(instruction.first, instruction.second)
 
     fun pushStack(byte: RawByte) {
         writeMemory(RawShort(S, RawByte.ONE), byte)
@@ -124,7 +126,7 @@ class Virtual6502() {
 
     fun calculateNegative(value: RawByte) {
         if (!isOn) return
-        negativeFlag = value.data.toByte() < 0
+        negativeFlag = value[7]
     }
 
     fun calculateZero(value: RawByte) {
