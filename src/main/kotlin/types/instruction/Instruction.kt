@@ -300,5 +300,6 @@ enum class Instruction (val run: (Virtual6502, AddressMode, RawShort) -> Unit) {
         v6502.A = v6502.Y
         v6502.calculateNegative(v6502.A)
         v6502.calculateZero(v6502.A)
-    });
+    }),
+    ERROR({ _, _, _ -> throw Exception("Invalid instruction!")})
 }

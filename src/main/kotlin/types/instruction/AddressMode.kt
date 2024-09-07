@@ -20,5 +20,6 @@ enum class AddressMode(val instructionLength: UInt, val getAddress: (Virtual6502
     PRE_INDIRECT_Y(3u, { v6502, nextWord -> v6502.readMemory(nextWord + v6502.Y, nextWord + v6502.Y + 1u) }),
     POST_INDIRECT_X(3u, { v6502, nextWord -> v6502.readMemory(nextWord, nextWord + 1u) + v6502.X }),
     POST_INDIRECT_Y(3u, { v6502, nextWord -> v6502.readMemory(nextWord, nextWord + 1u) + v6502.Y }),
-    RELATIVE(2u, { _, nextWord -> nextWord })
+    RELATIVE(2u, { _, nextWord -> nextWord }),
+    ERROR(0u, { _, _ -> throw Exception("Invalid Address Mode!")})
 }

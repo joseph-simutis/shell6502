@@ -93,8 +93,70 @@ class Virtual6502() {
         return true
     }
 
-    private fun decodeInstruction(byte: RawByte): Pair<Instruction, AddressMode>? {
-        TODO()
+    private fun decodeInstruction(byte: RawByte): Pair<Instruction, AddressMode> {
+        val halves = Pair(byte and RawByte(0xFu), RawByte(byte.data.toUInt().shr(4).toUByte()))
+        if (halves.first == RawByte(0x8u)) {
+            return Pair(when(halves.second) {
+                RawByte.ZERO -> Instruction.PHP
+                RawByte.ONE -> Instruction.CLC
+                RawByte(0x2u) -> Instruction.PLP
+                RawByte(0x3u) -> Instruction.SEC
+                RawByte(0x4u) -> Instruction.PHA
+                RawByte(0x5u) -> Instruction.CLI
+                RawByte(0x6u) -> Instruction.PLA
+                RawByte(0x7u) -> Instruction.SEI
+                RawByte(0x8u) -> Instruction.DEY
+                RawByte(0x9u) -> Instruction.TYA
+                RawByte(0xAu) -> Instruction.TAY
+                RawByte(0xBu) -> Instruction.CLV
+                RawByte(0xCu) -> Instruction.INY
+                RawByte(0xDu) -> Instruction.CLD
+                RawByte(0xEu) -> Instruction.INX
+                RawByte(0xFu) -> Instruction.SED
+                else -> Instruction.ERROR
+            }, AddressMode.IMPLIED)
+        } else if (halves.first == RawByte(0xAu) && halves.second > RawByte(0x7u)) {
+            return Pair(when(halves.second) {
+                RawByte(0x8u) -> Instruction.TXA
+                RawByte(0x9u) -> Instruction.TXS
+                RawByte(0xAu) -> Instruction.TAX
+                RawByte(0xBu) -> Instruction.TSX
+                RawByte(0xCu) -> Instruction.DEC
+                RawByte(0xEu) -> Instruction.NOP
+                else -> Instruction.ERROR
+            }, AddressMode.IMPLIED)
+        } else {
+            val aaa = RawByte((byte and RawByte(0xE0u)).toUInt().shr(5).toUByte())
+            val bbb = RawByte((byte and RawByte(0x1Cu)).toUInt().shr(2).toUByte())
+            val cc = byte and RawByte(0x3u)
+
+            return when(cc) {
+                RawByte.ONE -> Pair(when(aaa) {
+                    RawByte.ZERO -> Instruction.ORA
+                    RawByte.ONE -> Instruction.AND
+                    RawByte(0x2u) -> Instruction.EOR
+                    RawByte(0x3u) -> Instruction.ADC
+                    RawByte(0x4u) -> Instruction.STA
+                    RawByte(0x5u) -> Instruction.LDA
+                    RawByte(0x6u) -> Instruction.CMP
+                    RawByte(0x7u) -> Instruction.SBC
+                    else -> Instruction.ERROR
+                }, when(bbb) {
+                    RawByte.ZERO -> AddressMode.PRE_INDIRECT_X
+                    RawByte.ONE -> AddressMode.POST_INDIRECT_Y
+                    RawByte(0x2u) -> AddressMode.ZERO_PAGE
+                    RawByte(0x3u) -> AddressMode.ZERO_PAGE_X
+                    RawByte(0x4u) -> AddressMode.IMMEDIATE
+                    RawByte(0x5u) -> AddressMode.ABSOLUTE_Y
+                    RawByte(0x6u) -> AddressMode.ABSOLUTE
+                    RawByte(0x7u) -> AddressMode.ABSOLUTE_X
+                    else -> AddressMode.ERROR
+                })
+                RawByte(0x2u) -> Pair(when(aaa) {}, when(bbb) {})
+                RawByte(0x3u) -> {}
+                else -> Pair(Instruction.ERROR, AddressMode.ERROR)
+            }
+        }
     }
 
     private fun runInstruction(instruction: Instruction, addressMode: AddressMode) {
