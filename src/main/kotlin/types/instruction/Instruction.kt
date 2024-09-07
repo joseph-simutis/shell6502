@@ -5,12 +5,13 @@ import io.github.josephsimutis.types.RawShort
 
 enum class Instruction (val run: (Virtual6502, AddressMode, RawShort) -> Unit) {
     ADC({ v6502, _, address ->
-        val output = v6502.A.addWithCarry(v6502.readMemory(address), v6502.carryFlag)
+        val input = Pair(v6502.A, v6502.readMemory(address))
+        val output = input.first.addWithCarry(input.second, v6502.carryFlag)
         v6502.A = output.first
         v6502.calculateNegative(output.first)
         v6502.calculateZero(output.first)
         v6502.carryFlag = output.second
-        v6502.calculateOverflow()
+        v6502.calculateOverflow(input, output.first)
     }),
     AND({ v6502, _, address ->
         v6502.A = v6502.A and v6502.readMemory(address)
@@ -226,12 +227,13 @@ enum class Instruction (val run: (Virtual6502, AddressMode, RawShort) -> Unit) {
         v6502.PC++
     }),
     SBC({ v6502, _, address ->
-        val output = v6502.A.subtractWithBorrow(v6502.readMemory(address), v6502.carryFlag)
+        val input = Pair(v6502.A, v6502.readMemory(address))
+        val output = input.first.subtractWithBorrow(input.second, v6502.carryFlag)
         v6502.A = output.first
         v6502.calculateNegative(output.first)
         v6502.calculateZero(output.first)
         v6502.carryFlag = output.second
-        v6502.calculateOverflow()
+        v6502.calculateOverflow(input, output.first)
     }),
     SEC({ v6502, _, _ ->
         v6502.carryFlag = true

@@ -127,12 +127,13 @@ class Virtual6502() {
         negativeFlag = value.data.toByte() < 0
     }
 
-    fun calculateOverflow() {
-        if (!isOn) return
-    }
-
     fun calculateZero(value: RawByte) {
         if (!isOn) return
         zeroFlag = value == RawByte.ZERO
+    }
+
+    fun calculateOverflow(input: Pair<RawByte, RawByte>, output: RawByte) {
+        if (!isOn) return
+        overflowFlag = (input.first[7] == input.second[7]) && (input.first[7] != output[7])
     }
 }

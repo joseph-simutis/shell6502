@@ -37,16 +37,14 @@ value class RawByte(val data: UByte) : Comparable<RawByte> {
     infix fun and(other: RawByte) = RawByte(data and other.data)
     infix fun or(other: RawByte) = RawByte(data or other.data)
     infix fun xor(other: RawByte) = RawByte(data xor other.data)
+    operator fun not() = RawByte(data.inv())
 
     fun addWithCarry(other: RawByte, carry: Boolean) : Pair<RawByte, Boolean> {
         val output = toRawShort() + other.toRawShort() + if (carry) 1u else 0u
         return Pair(output.low, output.data > UByte.MAX_VALUE)
     }
 
-    fun subtractWithBorrow(other: RawByte, carry: Boolean) : Pair<RawByte, Boolean> {
-        val output
-        return Pair(output.low, output.data > UByte.MAX_VALUE)
-    }
+    fun subtractWithBorrow(other: RawByte, carry: Boolean) : Pair<RawByte, Boolean> = addWithCarry(!other, carry)
 
     fun shiftLeft(carry: Boolean): Pair<RawByte, Boolean> {
         val output = (data.toUInt() shl 1) + if (carry) 1u else 0u
